@@ -35,15 +35,11 @@ func StoreSession(userId int) (string, error) {
 }
 
 func GetSession(token string) (int, error) {
-	row := app.DB.QueryRow(
-		"SELECT "+
-				"UserId"+
-			"FROM "+
-				"session "+
-			"WHERE Session=?",
-		token)
+
 	var userId int
-	err := row.Scan(userId)
+	err := app.DB.QueryRow(
+		"SELECT UserId FROM session WHERE Session=?",
+		token).Scan(&userId)
 
 	if err != nil {
 		log.Println("Get Session failed: ", err)

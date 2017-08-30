@@ -42,3 +42,25 @@ func MakeInsertQuery(table string, myMap map[string]interface{}) (string, []inte
 		placeholders[:len(placeholders)-1],
 	), vals
 }
+
+func MakeUpdateQuery(table string, set map[string]interface{}, where map[string]interface{}) (string, []interface{}) {
+	keys := make([]string, 0, len(set))
+	vals := make([]interface{}, 0, len(set))
+	wkeys := make([]string, 0, len(where))
+	for key, val := range set {
+		keys = append(keys, key+"=?")
+		vals = append(vals, val)
+	}
+
+	for key, val := range where {
+		wkeys = append(wkeys, key+"=?")
+		vals = append(vals, val)
+	}
+
+	return fmt.Sprintf(
+		"UPDATE %s SET %s WHERE %s",
+		table,
+		strings.Join(keys, ", "),
+		strings.Join(wkeys, ", "),
+	), vals
+}
