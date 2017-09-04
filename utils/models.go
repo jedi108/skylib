@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -99,4 +100,14 @@ func setField(obj *interface{}, name string, value interface{}) error {
 
 	structFieldValue.Set(val)
 	return nil
+}
+
+func NewNullString(s string) sql.NullString {
+	if len(s) == 0 {
+		return sql.NullString{}
+	}
+	return sql.NullString{
+		String: s,
+		Valid:  true,
+	}
 }
