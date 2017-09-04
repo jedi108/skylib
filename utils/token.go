@@ -37,6 +37,7 @@ func StoreSession(userId int) (string, error) {
 func GetSession(token string) (int, error) {
 
 	var userId int
+	app.GetConnection()
 	err := app.DB.QueryRow(
 		"SELECT UserId FROM session WHERE Session=?",
 		token).Scan(&userId)
