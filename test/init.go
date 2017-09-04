@@ -1,19 +1,28 @@
 package test
 
 import (
-	"skylib/app"
-	"runtime"
 	"path/filepath"
+	"runtime"
+	"skylib/app"
 )
 
 var isInit = false
 
-func InitPathConfigTest()  {
-	_, b, _, _  := runtime.Caller(0)
-	app.ThisDir = filepath.Dir( b) + "/../"
+var InitTest = func() {
+	if isInit == false {
+		app.ThisDir = "../"
+		isInit = true
+		app.InitLog()
+		app.GetConnection()
+	}
 }
 
-func InitTestDatabase()  {
+func InitPathConfigTest() {
+	_, b, _, _ := runtime.Caller(0)
+	app.ThisDir = filepath.Dir(b) + "/../"
+}
+
+func InitTestDatabase() {
 	if isInit {
 		return
 	}
