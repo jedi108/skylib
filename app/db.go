@@ -14,7 +14,19 @@ var (
 
 func openConnection() {
 	config_db := GetConfig("database")
-	DB, err = sql.Open("mysql", fmt.Sprintf("%v:%v@/%v", config_db["username"], config_db["password"], config_db["dbname"]))
+
+	if config_db["protocol"] == "" {
+		config_db["protocol"] = "tcp"
+	}
+	if config_db["host"] == "" {
+		config_db["host"] = "localhost"
+	}
+	if config_db["port"] == "" {
+		config_db["port"] = "3306"
+	}
+	netAddr := fmt.Sprintf("%s(%s:%s)", config_db["protocol"], config_db["host"], config_db["port"])
+	dsn := fmt.Sprintf("%s:%s@%s/%s?timeout=30s&strict=true", config_db["username"], config_db["password"], netAddr, config_db["dbname"])
+	DB, err = sql.Open("mysql", dsn)
 	if err != nil {
 		panic("failed to connect database:\n" + err.Error())
 	}
