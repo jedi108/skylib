@@ -25,7 +25,7 @@ var PublicKeydata = ""
 var PublicKeyResponse = ""
 var PrivateKeyData = ""
 
-func initKeys() {
+func InitKeys() {
 	if isInitKeysConfig == false {
 		ks := app.GetConfig("keys")
 		PublicKeydata = ks["PublicKeydata"].(string)
@@ -56,12 +56,12 @@ func getKeyPairInclude(strPub string, strPriv string) *keyPair {
 }
 
 func getKeyPair() *keyPair {
-	initKeys()
+	InitKeys()
 	return getKeyPairInclude(PublicKeydata, PrivateKeyData)
 }
 
 func getKeyPairRespone() *keyPair {
-	initKeys()
+	InitKeys()
 	return getKeyPairInclude(PublicKeyResponse, PrivateKeyData)
 }
 
@@ -97,13 +97,13 @@ func GetValuesFromArray(j []byte) (io.Reader) {
 
 //Криптование
 func GetCrypted(myvar []byte) []byte {
-	initKeys()
+	InitKeys()
 	return getEncrypt(myvar, PublicKeydata)
 }
 
 //Криптование
 func GetCryptedResponse(myvar []byte) []byte {
-	initKeys()
+	InitKeys()
 	return getEncrypt(myvar, PublicKeyResponse)
 }
 
