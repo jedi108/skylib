@@ -8,9 +8,11 @@ import (
 
 var isInit = false
 
+var DefaultDir = "../"
+
 var InitTest = func() {
 	if isInit == false {
-		app.ThisDir = "../"
+		app.ThisDir = DefaultDir
 		isInit = true
 		app.InitLog()
 		app.GetConnection()

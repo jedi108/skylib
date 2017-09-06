@@ -7,17 +7,32 @@ import (
 	"fmt"
 	"github.com/mdp/sodiumbox"
 	"io"
-	"strconv"
-	"skylib/app"
-	b64 "encoding/base64"
-	"reflect"
 	"io/ioutil"
 	"net/http"
+	"reflect"
+	"skylib/app"
+	"strconv"
+	b64 "encoding/base64"
 )
 
 type keyPair struct {
 	secretKey [32]byte
 	publicKey [32]byte
+}
+
+var isInitKeysConfig = false;
+var PublicKeydata = ""
+var PublicKeyResponse = ""
+var PrivateKeyData = ""
+
+func initKeys() {
+	if isInitKeysConfig == false {
+		ks := app.GetConfig("keys")
+		PublicKeydata = ks["PublicKeydata"].(string)
+		PublicKeyResponse = ks["PublicKeyResponse"].(string)
+		PrivateKeyData = ks["PrivateKeyData"].(string)
+		isInitKeysConfig = true
+	}
 }
 
 func StreamToByte(stream io.Reader) []byte {
@@ -26,18 +41,28 @@ func StreamToByte(stream io.Reader) []byte {
 	return buf.Bytes()
 }
 
-func getKeyPair() *keyPair {
-	publicKeySlice, _ := b64.StdEncoding.DecodeString(app.PubKey)
+func getKeyPairInclude(strPub string, strPriv string) *keyPair {
+	publicKeySlice, _ := b64.StdEncoding.DecodeString(strPub)
 	publicKey := *new([32]byte)
 	copy(publicKey[:], publicKeySlice[0:32])
 
-	privateKeySlice, _ := b64.StdEncoding.DecodeString(app.PrivKey)
+	privateKeySlice, _ := b64.StdEncoding.DecodeString(strPriv)
 	privateKey := *new([32]byte)
 	copy(privateKey[:], privateKeySlice[0:32])
 	return &keyPair{
 		secretKey: privateKey,
 		publicKey: publicKey,
 	}
+}
+
+func getKeyPair() *keyPair {
+	initKeys()
+	return getKeyPairInclude(PublicKeydata, PrivateKeyData)
+}
+
+func getKeyPairRespone() *keyPair {
+	initKeys()
+	return getKeyPairInclude(PublicKeyResponse, PrivateKeyData)
 }
 
 func DecryptRequest(j []byte) []byte {
@@ -72,18 +97,44 @@ func GetValuesFromArray(j []byte) (io.Reader) {
 
 //Криптование
 func GetCrypted(myvar []byte) []byte {
-	publicKeySlice, _ := b64.StdEncoding.DecodeString(app.PubKey)
+	initKeys()
+	return getEncrypt(myvar, PublicKeydata)
+}
+
+//Криптование
+func GetCryptedResponse(myvar []byte) []byte {
+	initKeys()
+	return getEncrypt(myvar, PublicKeyResponse)
+}
+
+func getEncrypt(myvar []byte, strPub string) []byte {
+	publicKeySlice, _ := b64.StdEncoding.DecodeString(strPub)
 	publicKey := *new([32]byte)
 	copy(publicKey[:], publicKeySlice[0:32])
-	sealedMsg, _ := sodiumbox.Seal(myvar, &publicKey)
+	sealedMsg, err := sodiumbox.Seal(myvar, &publicKey)
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(err)
+	}
 	return sealedMsg.Box
 }
 
 //Декриптования
 func GetDecrypted(sealedMsg []byte) *sodiumbox.Message {
 	testKeyPair := getKeyPair()
+	return getDecrypt(sealedMsg, testKeyPair)
+}
+
+//Декриптования
+func GetDecryptedResponse(sealedMsg []byte) *sodiumbox.Message {
+	testKeyPair := getKeyPairRespone()
+	return getDecrypt(sealedMsg, testKeyPair)
+}
+
+func getDecrypt(sealedMsg []byte, testKeyPair *keyPair) *sodiumbox.Message {
 	msg, e := sodiumbox.SealOpen(sealedMsg, &testKeyPair.publicKey, &testKeyPair.secretKey)
 	if e != nil {
+		fmt.Println(e.Error())
 		panic(e)
 	}
 	return msg

@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var FillStructVerbose = false
+
 var RandomText = func(length int) string {
 	var seededRand *rand.Rand = rand.New(
 		rand.NewSource(time.Now().UnixNano()))
@@ -52,50 +54,70 @@ func setField(obj *interface{}, name string, value interface{}) error {
 		switch structFieldType.Kind() {
 		case reflect.Float64, reflect.Float32:
 			val64, errType = strconv.ParseFloat(val.String(), 32)
-			println("val64:", val64)
 			structFieldValue.SetFloat(val64)
-			fmt.Println(" structFieldValue", structFieldValue.String())
-			fmt.Println(" val", val)
+
+			if FillStructVerbose {
+				fmt.Println("val64:", val64)
+				fmt.Println(" structFieldValue", structFieldValue.String())
+				fmt.Println(" val", val)
+			}
+
 			return nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			valInt, errType = strconv.ParseInt(val.String(), 64, 32)
-			println("valInt:", valInt)
-			println("val.String():", val.String())
 			structFieldValue.SetInt(valInt)
+
+			if FillStructVerbose {
+				fmt.Println("valInt:", valInt)
+				fmt.Println("val.String():", val.String())
+			}
+
 			return nil
 		default:
-			fmt.Println("-----------------------------")
-			fmt.Println("name", name)
-			fmt.Println("val", val)
-			fmt.Println("structFieldType", structFieldType)
-			fmt.Println("val.Type()", val.Type())
-			fmt.Println("structFieldValue", structFieldValue)
-			fmt.Println("structValue", structValue)
+
+			if FillStructVerbose {
+				fmt.Println("-----------------------------")
+				fmt.Println("name", name)
+				fmt.Println("val", val)
+				fmt.Println("structFieldType", structFieldType)
+				fmt.Println("val.Type()", val.Type())
+				fmt.Println("structFieldValue", structFieldValue)
+				fmt.Println("structValue", structValue)
+			}
+
 			invalidTypeError := errors.New("Value type didn't match obj field type")
 			return invalidTypeError
 		}
 
 		if errType != nil {
-			fmt.Println("-----------------------------")
-			fmt.Println("name", name)
-			fmt.Println("structFieldType", structFieldType)
-			fmt.Println("val.Type()", val.Type())
-			fmt.Println("val", val)
-			fmt.Println("structFieldValue", structFieldValue)
-			fmt.Println("structValue", structValue)
+
+			if FillStructVerbose {
+				fmt.Println("-----------------------------")
+				fmt.Println("name", name)
+				fmt.Println("structFieldType", structFieldType)
+				fmt.Println("val.Type()", val.Type())
+				fmt.Println("val", val)
+				fmt.Println("structFieldValue", structFieldValue)
+				fmt.Println("structValue", structValue)
+			}
+
 			invalidTypeError := errors.New("Provided value type didn't match obj field type")
 			return invalidTypeError
 		}
 
 		return nil
 	} else {
-		fmt.Println("-------is ok")
-		fmt.Println("name", name)
-		fmt.Println("structFieldType", structFieldType)
-		fmt.Println("val.Type()", val.Type())
-		fmt.Println("val", val)
-		fmt.Println("structFieldValue", structFieldValue)
-		fmt.Println("structValue", structValue)
+
+		if FillStructVerbose {
+			fmt.Println("-------is ok")
+			fmt.Println("name", name)
+			fmt.Println("structFieldType", structFieldType)
+			fmt.Println("val.Type()", val.Type())
+			fmt.Println("val", val)
+			fmt.Println("structFieldValue", structFieldValue)
+			fmt.Println("structValue", structValue)
+		}
+
 	}
 
 	structFieldValue.Set(val)

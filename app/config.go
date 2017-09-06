@@ -8,9 +8,6 @@ import (
 
 var config map[string]*json.RawMessage
 
-const PrivKey = "DM0HozajCtlOryLKnVnhS226Nq3Gsm7AGLeShIL7WBg="
-const PubKey = "NvalbqygT8G2jp4IXJCW1OHia3LnDCqaqqV0i6w5Mys="
-
 var ThisDir = ""
 var ConfigDevFileJson = "config.dev.json"
 var ConfigTestsFileJson = "config.tests.json"
@@ -26,7 +23,7 @@ func GetConfig(section string) map[string]interface{} {
 		}
 
 		if err != nil {
-			fmt.Println("config not open")
+			fmt.Println("config not open", err.Error())
 			panic(err)
 		}
 		str := string(bs)
