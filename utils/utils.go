@@ -132,10 +132,12 @@ func GetDecryptedResponse(sealedMsg []byte) (*sodiumbox.Message, error) {
 }
 
 func getDecrypt(sealedMsg []byte, testKeyPair *keyPair) (*sodiumbox.Message, error) {
+	if len(sealedMsg)<33 {
+		return nil, errors.New("open message error")
+	}
 	msg, e := sodiumbox.SealOpen(sealedMsg, &testKeyPair.publicKey, &testKeyPair.secretKey)
 	if e != nil {
-		fmt.Println(e.Error())
-		//panic(e)
+		return nil, errors.New("encrypt error")
 	}
 	return msg, e
 }
