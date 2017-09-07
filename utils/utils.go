@@ -76,7 +76,7 @@ func DecryptRequest(j []byte) []byte {
 	for i := 0; i < len(raw); i++ {
 		buff.WriteByte(raw[i])
 	}
-	de := GetDecrypted([]byte(buff.String()))
+	de, _ := GetDecrypted([]byte(buff.String()))
 	return de.Content
 }
 
@@ -120,24 +120,24 @@ func getEncrypt(myvar []byte, strPub string) []byte {
 }
 
 //Декриптования
-func GetDecrypted(sealedMsg []byte) *sodiumbox.Message {
+func GetDecrypted(sealedMsg []byte) (*sodiumbox.Message, error) {
 	testKeyPair := getKeyPair()
 	return getDecrypt(sealedMsg, testKeyPair)
 }
 
 //Декриптования
-func GetDecryptedResponse(sealedMsg []byte) *sodiumbox.Message {
+func GetDecryptedResponse(sealedMsg []byte) (*sodiumbox.Message, error) {
 	testKeyPair := getKeyPairRespone()
 	return getDecrypt(sealedMsg, testKeyPair)
 }
 
-func getDecrypt(sealedMsg []byte, testKeyPair *keyPair) *sodiumbox.Message {
+func getDecrypt(sealedMsg []byte, testKeyPair *keyPair) (*sodiumbox.Message, error) {
 	msg, e := sodiumbox.SealOpen(sealedMsg, &testKeyPair.publicKey, &testKeyPair.secretKey)
 	if e != nil {
 		fmt.Println(e.Error())
-		panic(e)
+		//panic(e)
 	}
-	return msg
+	return msg, e
 }
 
 func ToBinJson(rc []byte) io.Reader {
@@ -162,7 +162,8 @@ func ToBinJson(rc []byte) io.Reader {
 func FromEncryptRespToJsonString(req *http.Request) map[string]string {
 	body, _ := ioutil.ReadAll(req.Body)
 	bodyValues := GetValuesFromArray(body)
-	bodyRaw := GetDecrypted(StreamToByte(bodyValues)).Content
+	bodyCrypted, _ := GetDecrypted(StreamToByte(bodyValues))
+	bodyRaw := bodyCrypted.Content
 	var bodyJson map[string]string
 	json.Unmarshal(bodyRaw, &bodyJson)
 	return bodyJson
