@@ -1,6 +1,10 @@
 package utils
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+	"log"
+)
 
 type Error struct {
 	Field   string
@@ -12,6 +16,13 @@ type ApiErrors struct {
 	Code	int
 	Message string
 	Errors []Error
+}
+
+func ResponseError(HttpError int, s string, resp http.ResponseWriter) {
+	log.Println(s)
+	resp.WriteHeader(HttpError)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Write(GetApiError(s))
 }
 
 func GetApiError(error string) []byte {
