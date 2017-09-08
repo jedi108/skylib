@@ -1,33 +1,37 @@
 package test
 
 import (
-	"path/filepath"
-	"runtime"
+	"os"
 	"skylib/app"
+	"testing"
 )
 
 var isInit = false
 
-var DefaultDir = "../"
-
+/** init for "go run project" */
 var InitTest = func() {
 	if isInit == false {
-		app.ThisDir = DefaultDir
-		isInit = true
-		app.InitLog()
-		app.GetConnection()
+		startConfig()
 	}
 }
 
-func InitPathConfigTest() {
-	_, b, _, _ := runtime.Caller(0)
-	app.ThisDir = filepath.Dir(b) + "/../"
+/** init for "go test -v ..." */
+var InitForTest =  func(t *testing.T) {
+	if isInit == false {
+		T = t
+		startConfig()
+	}
 }
 
-func InitTestDatabase() {
-	if isInit {
-		return
-	}
-	isInit = true
+func startConfig()  {
+	app.ThisDir = DefaultDir
 	app.ConfigDevFileJson = app.ConfigTestsFileJson
+	isInit = true
+	app.InitLog()
+	app.GetConnection()
+	RunFixtures()
+}
+
+func Args() []string {
+	return os.Args[1:]
 }
