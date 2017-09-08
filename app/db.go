@@ -2,9 +2,10 @@ package app
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"strings"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -35,6 +36,17 @@ func openConnection() {
 
 func GetConnection() {
 	if DB == nil {
+		//------------------------------------
+		// FOR WORK WITH TEST DATABASE
+		//
+		// go run main.go exec -test
+		//
+		//------------------------------------
+		boolPtr := flag.Bool("test", false, "a bool")
+		flag.Parse()
+		if *boolPtr == false {
+			ConfigDevFileJson = ConfigTestsFileJson
+		}
 		openConnection()
 	}
 }
