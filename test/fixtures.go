@@ -55,7 +55,8 @@ func CheckErr(err error) {
 	if err != nil {
 		PrintLn("__________________________________")
 		PrintLn(err.Error())
-		panic(err)
+		T.Error(err)
+		T.Fail()
 	}
 }
 
