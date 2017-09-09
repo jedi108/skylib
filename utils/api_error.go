@@ -25,6 +25,24 @@ func ResponseError(HttpError int, s string, resp http.ResponseWriter) {
 	resp.Write(GetApiError(s))
 }
 
+func ResponseErrors(HttpError int, ss []string, resp http.ResponseWriter) {
+	log.Println(ss)
+	resp.WriteHeader(HttpError)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Write(GetApiErrors(ss))
+}
+
+func ResponseSuccess(resp http.ResponseWriter) {
+	resp.WriteHeader(200)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Write([]byte(`{"Message":"ok"}`))
+}
+
+func Response(s string, resp http.ResponseWriter) {
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Write([]byte(s))
+}
+
 func GetApiError(error string) []byte {
 
 	var s []Error
