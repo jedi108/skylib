@@ -15,9 +15,9 @@ import (
 	b64 "encoding/base64"
 )
 
-type keyPair struct {
-	secretKey [32]byte
-	publicKey [32]byte
+type KeyPair struct {
+	SecretKey [32]byte
+	PublicKey [32]byte
 }
 
 var isInitKeysConfig = false;
@@ -41,7 +41,7 @@ func StreamToByte(stream io.Reader) []byte {
 	return buf.Bytes()
 }
 
-func getKeyPairInclude(strPub string, strPriv string) *keyPair {
+func GetKeyPairInclude(strPub string, strPriv string) *KeyPair {
 	publicKeySlice, _ := b64.StdEncoding.DecodeString(strPub)
 	publicKey := *new([32]byte)
 	copy(publicKey[:], publicKeySlice[0:32])
@@ -49,20 +49,20 @@ func getKeyPairInclude(strPub string, strPriv string) *keyPair {
 	privateKeySlice, _ := b64.StdEncoding.DecodeString(strPriv)
 	privateKey := *new([32]byte)
 	copy(privateKey[:], privateKeySlice[0:32])
-	return &keyPair{
-		secretKey: privateKey,
-		publicKey: publicKey,
+	return &KeyPair{
+		SecretKey: privateKey,
+		PublicKey: publicKey,
 	}
 }
 
-func getKeyPair() *keyPair {
+func getKeyPair() *KeyPair {
 	InitKeys()
-	return getKeyPairInclude(PublicKeydata, PrivateKeyData)
+	return GetKeyPairInclude(PublicKeydata, PrivateKeyData)
 }
 
-func getKeyPairRespone() *keyPair {
+func getKeyPairRespone() *KeyPair {
 	InitKeys()
-	return getKeyPairInclude(PublicKeyResponse, PrivateKeyData)
+	return GetKeyPairInclude(PublicKeyResponse, PrivateKeyData)
 }
 
 func DecryptRequest(j []byte) []byte {
@@ -125,17 +125,21 @@ func GetDecrypted(sealedMsg []byte) (*sodiumbox.Message, error) {
 	return getDecrypt(sealedMsg, testKeyPair)
 }
 
+func GetDecryptedCustom(sealedMsg []byte, keyPair *KeyPair) (*sodiumbox.Message, error) {
+	return getDecrypt(sealedMsg, keyPair)
+}
+
 //Декриптования
 func GetDecryptedResponse(sealedMsg []byte) (*sodiumbox.Message, error) {
 	testKeyPair := getKeyPairRespone()
 	return getDecrypt(sealedMsg, testKeyPair)
 }
 
-func getDecrypt(sealedMsg []byte, testKeyPair *keyPair) (*sodiumbox.Message, error) {
+func getDecrypt(sealedMsg []byte, testKeyPair *KeyPair) (*sodiumbox.Message, error) {
 	if len(sealedMsg)<33 {
 		return nil, errors.New("open message error")
 	}
-	msg, e := sodiumbox.SealOpen(sealedMsg, &testKeyPair.publicKey, &testKeyPair.secretKey)
+	msg, e := sodiumbox.SealOpen(sealedMsg, &testKeyPair.PublicKey, &testKeyPair.SecretKey)
 	if e != nil {
 		return nil, errors.New("encrypt error")
 	}
