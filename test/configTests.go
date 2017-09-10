@@ -9,7 +9,7 @@ var DirFixtures = "../tests/fixtures/"
 var DefaultDir = "../"
 
 /** log your fixtures */
-var isVerboseFixtures = true;
+var isVerboseFixtures = false;
 
 /** for debug log test */
 var T *testing.T

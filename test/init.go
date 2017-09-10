@@ -1,37 +1,31 @@
+/**
+	Initialize the fixtures tests
+	this packege helpers for tests
+
+	use parametr -p=1 to run all functional tests in one proccess
+	example:
+
+		go test ./... -p=1 -v
+
+ */
 package test
 
 import (
-	"os"
 	"skylib/app"
 	"testing"
 )
 
 var isInit = false
 
-/** init for "go run project" */
-var InitTest = func() {
-	if isInit == false {
-		startConfig()
-	}
-}
-
-/** init for "go test -v ..." */
-var InitForTest =  func(t *testing.T) {
+/** init for "go test ./... -p=1" */
+var InitForTest = func(t *testing.T) {
 	if isInit == false {
 		T = t
-		startConfig()
+		app.ThisDir = DefaultDir
+		app.ConfigDevFileJson = app.ConfigTestsFileJson
+		isInit = true
+		app.InitLog()
+		app.GetConnection()
+		RunFixtures()
 	}
-}
-
-func startConfig()  {
-	app.ThisDir = DefaultDir
-	app.ConfigDevFileJson = app.ConfigTestsFileJson
-	isInit = true
-	app.InitLog()
-	app.GetConnection()
-	RunFixtures()
-}
-
-func Args() []string {
-	return os.Args[1:]
 }
