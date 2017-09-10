@@ -20,12 +20,18 @@ func SetToken(token string) {
 	tokenClient = token
 }
 
-func SendRequest(uri string, structure interface{}) sendReq {
+func SendRequestJsonString(uri string, stringJson string) sendReq {
+	return sendRequest(uri, utils.GetCrypted([]byte(stringJson)))
+}
+
+func SendRequestJsonStruct(uri string, structure interface{}) sendReq {
 	jsonStruct, err := json.Marshal(structure)
 	CheckErr(err)
-	PrintLn(string(jsonStruct))
-	encryptedJsonStruct := utils.GetCrypted([]byte(jsonStruct))
-	ioEncryptJson := bytes.NewReader(encryptedJsonStruct)
+	return sendRequest(uri, utils.GetCrypted([]byte(jsonStruct)))
+}
+
+func sendRequest(uri string, cryptedJson []byte) sendReq {
+	ioEncryptJson := bytes.NewReader(cryptedJson)
 
 	req, err := http.NewRequest("POST", url+uri, ioEncryptJson)
 	req.Header.Set("Content-Type", "application/octet-stream")
