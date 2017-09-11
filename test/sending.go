@@ -7,13 +7,17 @@ import (
 	"skylib/utils"
 )
 
-const url = "http://127.0.0.1:9002/"
+var url = "http://127.0.0.1:9002/"
 
 var tokenClient = ""
 
 type sendReq struct {
 	Response *http.Response
 	Body     string
+}
+
+func SetUrl(apiUrl string)  {
+	url = apiUrl
 }
 
 func SetToken(token string) {

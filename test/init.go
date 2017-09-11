@@ -29,3 +29,11 @@ var InitForTest = func(t *testing.T) {
 		RunFixtures()
 	}
 }
+
+/** init for "go test ./... -p=1" */
+var InitForStressTest = func(t *testing.T) {
+	if isInit == false {
+		T = t
+		app.ThisDir = DefaultDir
+	}
+}
