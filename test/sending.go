@@ -46,7 +46,10 @@ func sendRequest(uri string, cryptedJson []byte) sendReq {
 	var sendResponse = sendReq{}
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		T.Log("Error response: ", err.Error())
+	}
 	sendResponse.Response = resp
 
 	sendResponse.Body = string(buf.Bytes())
