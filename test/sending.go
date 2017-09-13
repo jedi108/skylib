@@ -32,16 +32,16 @@ func SendStressRequestJsonStruct(uri string, structure interface{}) {
 }
 
 func SendRequestJsonString(uri string, stringJson string) sendReq {
-	return sendRequest(uri, utils.GetCrypted([]byte(stringJson)))
+	return SendRequest(uri, utils.GetCrypted([]byte(stringJson)))
 }
 
 func SendRequestJsonStruct(uri string, structure interface{}) sendReq {
 	jsonStruct, err := json.Marshal(structure)
 	CheckErr(err)
-	return sendRequest(uri, utils.GetCrypted([]byte(jsonStruct)))
+	return SendRequest(uri, utils.GetCrypted([]byte(jsonStruct)))
 }
 
-func sendRequest(uri string, cryptedJson []byte) sendReq {
+func SendRequest(uri string, cryptedJson []byte) sendReq {
 	ioEncryptJson := bytes.NewReader(cryptedJson)
 
 	req, err := http.NewRequest("POST", url+uri, ioEncryptJson)
