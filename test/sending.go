@@ -24,6 +24,13 @@ func SetToken(token string) {
 	tokenClient = token
 }
 
+
+func SendStressRequestJsonStruct(uri string, structure interface{}) {
+	jsonStruct, err := json.Marshal(structure)
+	CheckErr(err)
+	sendStressRequest(uri, utils.GetCrypted([]byte(jsonStruct)))
+}
+
 func SendRequestJsonString(uri string, stringJson string) sendReq {
 	return sendRequest(uri, utils.GetCrypted([]byte(stringJson)))
 }
@@ -59,4 +66,28 @@ func sendRequest(uri string, cryptedJson []byte) sendReq {
 	sendResponse.Body = string(buf.Bytes())
 	T.Log(sendResponse.Body)
 	return sendResponse
+}
+
+
+func sendStressRequest(uri string, cryptedJson []byte) {
+	ioEncryptJson := bytes.NewReader(cryptedJson)
+
+	for i:=1; i<100000; i++ {
+		request(ioEncryptJson, uri)
+	}
+
+}
+
+func request(ioEncryptJson *bytes.Reader, uri string)  {
+	req, err := http.NewRequest("POST", url+uri, ioEncryptJson)
+
+	CheckErr(err)
+	if tokenClient != "" {
+		req.Header.Set("Token", tokenClient)
+	}
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("accept", "application/json, text/plain, */*")
+	client := &http.Client{}
+	client.Do(req)
+	//defer resp.Body.Close()
 }

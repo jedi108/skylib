@@ -66,7 +66,8 @@ func SetFieldInterface(modelStructure *interface{}, keyMap string, valueMap inte
 		structValue.SetString(valueOfType)
 	case bool:
 		if structValue.Type().Kind() != reflect.Bool {
-			return errors.New("No valid type of field `" + keyMap + "`")
+			return nil
+			//return errors.New("No valid type of field `" + keyMap + "`")
 		}
 		structValue.SetBool(valueOfType)
 	default:

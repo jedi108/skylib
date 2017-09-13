@@ -44,7 +44,7 @@ func GetConnection() {
 		//------------------------------------
 		boolPtr := flag.Bool("test", false, "a bool")
 		flag.Parse()
-		if *boolPtr == false {
+		if *boolPtr == true {
 			ConfigDevFileJson = ConfigTestsFileJson
 		}
 		openConnection()
