@@ -13,6 +13,11 @@ var (
 	err error
 )
 
+const (
+	max_idle    int = 0 // Can't keep idle conns open b/c of: https://github.com/go-sql-driver/mysql/issues/257
+	concurrency     = 0 // Keep 100 to this script from blasting the database
+)
+
 func openConnection() {
 	config_db := GetConfig("database")
 
@@ -28,10 +33,17 @@ func openConnection() {
 	netAddr := fmt.Sprintf("%s(%s:%s)", config_db["protocol"], config_db["host"], config_db["port"])
 	dsn := fmt.Sprintf("%s:%s@%s/%s?timeout=30s&strict=true", config_db["username"], config_db["password"], netAddr, config_db["dbname"])
 	DB, err = sql.Open("mysql", dsn)
+
+	if concurrency != 0 {
+		DB.SetMaxIdleConns(max_idle)
+		DB.SetMaxOpenConns(concurrency)
+	}
+
+	//defer DB.Close()
 	if err != nil {
 		panic("failed to connect database:\n" + err.Error())
 	}
-	//defer DB.Close()
+
 }
 
 func GetConnection() {
