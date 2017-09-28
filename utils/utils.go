@@ -107,6 +107,7 @@ func GetCryptedResponse(myvar []byte) []byte {
 	return getEncrypt(myvar, PublicKeyResponse)
 }
 
+
 func getEncrypt(myvar []byte, strPub string) []byte {
 	publicKeySlice, _ := b64.StdEncoding.DecodeString(strPub)
 	publicKey := *new([32]byte)
