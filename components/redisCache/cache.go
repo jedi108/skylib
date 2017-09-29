@@ -26,11 +26,16 @@ func Init() {
 	_, err := Client.Ping().Result()
 	if err != nil {
 		log.Println("Redis down")
+		Client = nil
 	}
 	// Output: PONG <nil>
 }
 
 func Set(namespace string, key string, value interface{}) {
+	if Client == nil {
+		return
+	}
+
 	jsonM, err := json.Marshal(value)
 	if err != nil {
 		log.Println(err)
