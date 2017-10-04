@@ -69,6 +69,49 @@ func SendRequest(uri string, cryptedJson []byte) sendReq {
 }
 
 
+func PerfectSendRequestJsonStruct(uri string, structure interface{}) (sendReq, error) {
+	jsonStruct, err := json.Marshal(structure)
+	CheckErr(err)
+	req, err := PerfectSendRequest(uri, utils.GetCrypted([]byte(jsonStruct)))
+	if err != nil {
+		return sendReq{}, err
+	}
+	return req, nil
+}
+
+func PerfectSendRequest(uri string, cryptedJson []byte) (sendReq, error) {
+	ioEncryptJson := bytes.NewReader(cryptedJson)
+	//T.Log(url+uri)
+	req, err := http.NewRequest("POST", url+uri, ioEncryptJson)
+	if err != nil {
+		return sendReq{}, err
+	}
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("accept", "application/json, text/plain, */*")
+	if tokenClient != "" {
+		req.Header.Set("Token", tokenClient)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return sendReq{}, err
+	}
+
+	//CheckErr(err)
+	var sendResponse = sendReq{}
+
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		T.Log("Error response: ", err.Error())
+	}
+	sendResponse.Response = resp
+
+	sendResponse.Body = string(buf.Bytes())
+	//T.Log(sendResponse.Body)
+	return sendResponse, nil
+}
+
 func sendStressRequest(uri string, cryptedJson []byte) {
 	ioEncryptJson := bytes.NewReader(cryptedJson)
 
