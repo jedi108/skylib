@@ -11,10 +11,11 @@
 package test
 
 import (
+	"os"
 	"skylib/app"
 	"skylib/components/redisCache"
+	"skylib/components/tarantoolQ"
 	"testing"
-	"os"
 )
 
 var isInit = false
@@ -56,10 +57,10 @@ var InitConfigTests = func(confiForTest ConfigTests, t *testing.T) {
 			RunFixtures()
 		}
 
-		t.Log("cache+++++++++++++++")
+		tarantoolQ.InitFromConfigTarantoolQueue()
+
 		if confiForTest.IsCacheClear {
 			redisCache.Init()
-			t.Log("clear cache+++++++++++++++")
 			keys := redisCache.Client.Keys("*")
 			for _, v := range keys.Val() {
 				redisCache.Client.Del(v)

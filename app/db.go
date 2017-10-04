@@ -2,6 +2,8 @@ package app
 
 import (
 	"database/sql"
+	"github.com/gocraft/dbr"
+	//sql "github.com/jmoiron/sqlx"
 	"flag"
 	"fmt"
 	"strings"
@@ -11,6 +13,7 @@ import (
 var (
 	DB  *sql.DB
 	err error
+	DbrConn dbr.Connection
 )
 
 const (
@@ -33,16 +36,25 @@ func openConnection() {
 	netAddr := fmt.Sprintf("%s(%s:%s)", config_db["protocol"], config_db["host"], config_db["port"])
 	dsn := fmt.Sprintf("%s:%s@%s/%s?timeout=30s&strict=true", config_db["username"], config_db["password"], netAddr, config_db["dbname"])
 	DB, err = sql.Open("mysql", dsn)
+	//defer DB.Close()
+	if err != nil {
+		panic("failed to connect database:\n" + err.Error())
+	}
+
+	dbrConn, err := dbr.Open("mysql", dsn, nil)
+	dbrConn.Ping()
+
+	//defer DB.Close()
+	if err != nil {
+		panic("failed to connect database:\n" + err.Error())
+	}
+
 
 	if concurrency != 0 {
 		DB.SetMaxIdleConns(max_idle)
 		DB.SetMaxOpenConns(concurrency)
 	}
 
-	//defer DB.Close()
-	if err != nil {
-		panic("failed to connect database:\n" + err.Error())
-	}
 
 }
 
