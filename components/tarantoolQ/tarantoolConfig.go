@@ -85,10 +85,16 @@ func InitFromConfigTarantoolQueue() {
 					/**
 						Init queue to pool queues
 					 */
-					QTarantool.PushToQueues(&QueueT{
+					err := QTarantool.PushToQueues(&QueueT{
 						ConnectionTarantool: &cnnLocalHost,
 						QueueName:           nameOfQueue,
 					})
+
+					if err != nil {
+						Messages = append(Messages, err.Error())
+						QueueServer.IsTarantoolServer = false
+						return
+					}
 
 					DebugText = append(DebugText, "--"+fmt.Sprintln(configListFieldsInSettingServer))
 				}
