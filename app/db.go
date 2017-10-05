@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	TYPERUN string //PRODUCTION, TESTING
 	DB  *sql.DB
 	err error
 	DbrConn dbr.Connection
@@ -70,6 +71,7 @@ func GetConnection() {
 		flag.Parse()
 		if *boolPtr == true {
 			ConfigDevFileJson = ConfigTestsFileJson
+			TYPERUN = "TESTING"
 		}
 		openConnection()
 	}
