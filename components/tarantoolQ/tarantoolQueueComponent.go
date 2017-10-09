@@ -28,7 +28,9 @@ type SkyQueue struct {
 func NewConnect() SkyQueue {
 	if SkyQ.IsEnableQueue == false {
 		SkyQ.Err = initTarantoolQueue()
-		return SkyQ
+		if SkyQ.Err == nil {
+			SkyQ.ConnectTarantool()
+		}
 	}
 	return SkyQ
 }
@@ -73,7 +75,7 @@ func initTarantoolQueue() error {
 		return errors.New("Not find: queue")
 	}
 	//SkyQ.IsEnableQueue = true
-	SkyQ.connect()
+
 	return nil
 }
 
@@ -115,7 +117,7 @@ func (skyQueue *SkyQueue) EchoStatistics() error {
 	return nil
 }
 
-func (skyQueue *SkyQueue) connect() SkyQueue {
+func (skyQueue *SkyQueue) ConnectTarantool() SkyQueue {
 	cnn, err := tarantool.Connect(skyQueue.host, tarantool.Opts{User: skyQueue.user, Pass: skyQueue.pass})
 	if err != nil {
 		skyQueue.Err = err
