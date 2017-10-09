@@ -1,7 +1,3 @@
-/**
-	New refactioring verison
- */
-
 package tarantoolQ
 
 import (
@@ -49,7 +45,6 @@ func initTarantoolQueue() error {
 		log.Println(err)
 		return errors.New("Not find: tarantool")
 	}
-
 	configIsEnableQueue, ok := configTarantool["enableQueue"]
 	if ok == false {
 		return errors.New("Not find: enableQueue")
@@ -110,12 +105,12 @@ func (skyQueue *SkyQueue) EchoStatistics() error {
 	if err != nil {
 		return err
 	}
+	fmt.Print("  _ buried:", skyQueue.StatTasks["buried"])
+	fmt.Print("  _ delayed:", skyQueue.StatTasks["delayed"])
+	fmt.Print("  _ done:", skyQueue.StatTasks["done"])
 	fmt.Print("  _ ready:", skyQueue.StatTasks["ready"])
 	fmt.Print("  _ taken:", skyQueue.StatTasks["taken"])
 	fmt.Print("  _ total:", skyQueue.StatTasks["total"])
-	fmt.Print("  _ done:", skyQueue.StatTasks["done"])
-	fmt.Print("  _ buried:", skyQueue.StatTasks["buried"])
-	fmt.Print("  _ delayed:", skyQueue.StatTasks["delayed"])
 	fmt.Println()
 	return nil
 }

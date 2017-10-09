@@ -1,30 +1,54 @@
 package redisCache
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-redis/redis"
 	"log"
+	"skylib/app"
+	"time"
 )
 
 var Client *redis.Client
 
-type RedisSource struct {
-	Addr     string
-	Password string
+var redisOptions redis.Options
+
+func connectToRedis() {
+	Client = redis.NewClient(&redisOptions)
 }
 
 func Init() {
-	Client = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	_, err := Client.Ping().Result()
+	if Client != nil {
+		return
+	}
+	err := app.InitAppConfig()
 	if err != nil {
-		log.Println("Redis down")
+		fmt.Println("config json not found")
+		log.Println("config json not found")
+		panic(err)
+	}
+	configRedis, err := app.GetConfigSelection("redis")
+	if err != nil {
+		fmt.Println("Redis not found in config")
+		log.Println("Redis not found in config")
+		return
+	}
+
+	var ok bool
+	redisOptions.Addr, ok = configRedis["addr"].(string)
+	if ok == false {
+		fmt.Println("Redis addr not found in config")
+		log.Println("Redis addr not found in config")
+		panic(err)
+	}
+
+	connectToRedis()
+
+	_, errPing := Client.Ping().Result()
+	if errPing != nil {
+		fmt.Println("Redis down", errPing.Error())
+		log.Println("Redis down", errPing.Error())
 		Client = nil
 	}
 	// Output: PONG <nil>
@@ -74,14 +98,18 @@ func DeleteCache(key string) error {
 	if Client == nil {
 		return errors.New("cache not connet")
 	}
-	return Client.Del(key).Err()
+	err := Client.Del(key).Err()
+	if err != nil {
+		log.Println(err)
+	}
+	return err
 }
 
 func GetCache(key string) (interface{}, error) {
 	if Client == nil {
 		return nil, errors.New("Client cache not connect")
 	}
-	log.Println("key GetCache", key)
+
 	result, err := Client.Get(key).Result()
 
 	if err == redis.Nil {
@@ -89,6 +117,7 @@ func GetCache(key string) (interface{}, error) {
 	}
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -98,89 +127,20 @@ func GetCache(key string) (interface{}, error) {
 	return encJson, err
 }
 
-func SetCache(key string, value interface{}) error {
+func SetCache(key string, value interface{}, expirations time.Duration) error {
 	if Client == nil {
 		return errors.New("cache not connet")
 	}
 
 	jsonM, err := json.Marshal(value)
 	if err != nil {
-		return err
-	}
-
-	return Client.Set(key, jsonM, 0).Err()
-}
-
-/**
-	DEPRECATED
- */
-func GetStruct(namespace string, key []byte) (interface{}, error) {
-	if Client == nil {
-		return nil, errors.New("Client cache not connect")
-	}
-	result, err := Client.Get(namespace + ":" + hex.EncodeToString(key)).Result()
-
-	if err == redis.Nil {
-		return nil, nil
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	var encJson map[string]interface{}
-	err = json.Unmarshal([]byte(result), &encJson)
-
-	return encJson, err
-}
-
-/**
-	DEPRECATED
- */
-func SetCacheStruct(namespace string, key []byte, value interface{}) error {
-	if Client == nil {
-		return errors.New("cache not connet")
-	}
-	nameSpaceKey := hex.EncodeToString(key)
-
-	jsonM, err := json.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	return Client.Set(namespace+":"+nameSpaceKey, jsonM, 0).Err()
-}
-
-/**
-	DEPRECATED
- */
-func SetStruct(namespace string, key []byte, value interface{}) {
-	if Client == nil {
-		return
-	}
-	nameSpaceKey := hex.EncodeToString(key)
-
-	jsonM, err := json.Marshal(value)
-	if err != nil {
 		log.Println(err)
-		return
-	}
-
-	err = Client.Set(namespace+":"+nameSpaceKey, jsonM, 0).Err()
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-/**
-	DEPRECATED
- */
-func SetSafeStruct(namespace string, key []byte, value interface{}) error {
-	nameSpaceKey := hex.EncodeToString(key)
-
-	jsonM, err := json.Marshal(value)
-	if err != nil {
 		return err
 	}
-	return Client.Set(namespace+":"+nameSpaceKey, jsonM, 0).Err()
+
+	err = Client.Set(key, jsonM, expirations).Err()
+	if err != nil {
+		log.Println("SetCache", err.Error())
+	}
+	return err
 }

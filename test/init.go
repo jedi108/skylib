@@ -28,12 +28,16 @@ type ConfigTests struct {
 	RootProjectDir   string
 	LogFileName      string
 	ExitAfterInit    bool
+	ReinitConfig     bool
 }
 
 /**
 	New init tests with configurable
  */
 var InitConfigTests = func(confiForTest ConfigTests, t *testing.T) {
+	if confiForTest.ReinitConfig {
+		isInit = false
+	}
 	if isInit == false {
 		T = t
 
@@ -57,7 +61,9 @@ var InitConfigTests = func(confiForTest ConfigTests, t *testing.T) {
 			RunFixtures()
 		}
 
-		tarantoolQ.InitFromConfigTarantoolQueue()
+		tarantoolQ.NewConnect()
+
+		//tarantoolQ.InitFromConfigTarantoolQueue()
 
 		if confiForTest.IsCacheClear {
 			redisCache.Init()
