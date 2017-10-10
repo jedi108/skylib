@@ -20,7 +20,7 @@ func StoreSession(userId int) (string, error) {
 	var token = generateToken()
 
 	app.GetConnection()
-	_, err := app.DB.Exec(
+	_, err := app.GetDB().Exec(
 		"INSERT INTO session "+
 			"(Session, UserId)"+
 			"VALUES (?,?);",
@@ -38,7 +38,7 @@ func GetSession(token string) (int, error) {
 
 	var userId int
 	app.GetConnection()
-	err := app.DB.QueryRow(
+	err := app.GetDB().QueryRow(
 		"SELECT UserId FROM session WHERE Session=?",
 		token).Scan(&userId)
 

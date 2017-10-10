@@ -41,7 +41,7 @@ func splitSql(sql string) {
 
 func runQuery(sql string) {
 	var pointers string
-	rows, err := app.DB.Query(sql)
+	rows, err := app.GetDB().Query(sql)
 	CheckErr(err)
 	for rows.Next() {
 		rows.Scan(&pointers)

@@ -2,25 +2,23 @@ package app
 
 import (
 	"database/sql"
-	"github.com/gocraft/dbr"
-	//sql "github.com/jmoiron/sqlx"
 	"flag"
 	"fmt"
+	"github.com/gocraft/dbr"
 	"strings"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
 	TYPERUN string //PRODUCTION, TESTING
-	DB  *sql.DB
-	err error
-	DbrConn dbr.Connection
+	DB      *sql.DB
+	err     error
+	DbrConn *dbr.Connection
 )
 
-const (
-	max_idle    int = 0 // Can't keep idle conns open b/c of: https://github.com/go-sql-driver/mysql/issues/257
-	concurrency     = 0 // Keep 100 to this script from blasting the database
-)
+func GetDB() *dbr.Connection {
+	return DbrConn
+}
 
 func openConnection() {
 	config_db := GetConfig("database")
@@ -29,7 +27,7 @@ func openConnection() {
 		config_db["protocol"] = "tcp"
 	}
 	if config_db["host"] == "" {
-		config_db["host"] = "localhost"
+		config_db["host"] = "127.0.0.1"
 	}
 	if config_db["port"] == "" {
 		config_db["port"] = "3306"
@@ -42,25 +40,21 @@ func openConnection() {
 		panic("failed to connect database:\n" + err.Error())
 	}
 
-	dbrConn, err := dbr.Open("mysql", dsn, nil)
-	dbrConn.Ping()
+	DbrConn, err = dbr.Open("mysql", dsn, nil)
 
 	//defer DB.Close()
 	if err != nil {
 		panic("failed to connect database:\n" + err.Error())
 	}
 
-
-	if concurrency != 0 {
-		DB.SetMaxIdleConns(max_idle)
-		DB.SetMaxOpenConns(concurrency)
+	err = DbrConn.Ping()
+	if err != nil {
+		panic("failed to ping database:\n" + err.Error())
 	}
-
-
 }
 
 func GetConnection() {
-	if DB == nil {
+	if GetDB() == nil {
 		//------------------------------------
 		// FOR WORK WITH TEST DATABASE
 		//
