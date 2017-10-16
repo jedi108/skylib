@@ -112,7 +112,7 @@ func DeleteCache(key string) error {
 		return errors.New("cache not connet")
 	}
 	err := Client.Del(key).Err()
-	if err != nil && redisCache.IsCacheEnable() {
+	if err != nil && IsCacheEnable() {
 		log.Println(err)
 	}
 	return err
@@ -130,7 +130,7 @@ func GetCache(key string) (interface{}, error) {
 	}
 
 	if err != nil {
-		if redisCache.IsCacheEnable() {
+		if IsCacheEnable() {
 			log.Println(err)
 		}
 		return nil, err
@@ -149,7 +149,7 @@ func SetCache(key string, value interface{}, expirations time.Duration) error {
 
 	jsonM, err := json.Marshal(value)
 	if err != nil {
-		if redisCache.IsCacheEnable() {
+		if IsCacheEnable() {
 			log.Println(err)
 			return err
 		}
@@ -157,7 +157,7 @@ func SetCache(key string, value interface{}, expirations time.Duration) error {
 
 	err = Client.Set(key, jsonM, expirations).Err()
 	if err != nil {
-		if redisCache.IsCacheEnable() {
+		if IsCacheEnable() {
 			log.Println("SetCache", err.Error())
 		}
 	}
