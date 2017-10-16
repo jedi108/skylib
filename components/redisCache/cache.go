@@ -13,6 +13,11 @@ import (
 var Client *redis.Client
 
 var redisOptions redis.Options
+var isEnable bool
+
+func IsCacheEnable() bool  {
+	return isEnable
+}
 
 func connectToRedis() {
 	Client = redis.NewClient(&redisOptions)
@@ -36,6 +41,15 @@ func Init() {
 	}
 
 	var ok bool
+
+	isEnable, ok = configRedis["enableRedis"].(bool)
+	if ok == true {
+		if isEnable == false {
+			return
+		}
+	}
+
+
 	redisOptions.Addr, ok = configRedis["addr"].(string)
 	if ok == false {
 		fmt.Println("Redis addr not found in config")

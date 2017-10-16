@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"skylib/app"
+	"time"
 )
 
 var SkyQ SkyQueue
@@ -117,7 +118,12 @@ func (skyQueue *SkyQueue) EchoStatistics() error {
 	return nil
 }
 
+func t() time.Duration {
+	return time.Second * 2
+}
+
 func (skyQueue *SkyQueue) ConnectTarantool() SkyQueue {
+	//cnn, err := tarantool.Connect(skyQueue.host, tarantool.Opts{User: skyQueue.user, Pass: skyQueue.pass, Timeout:time.Second * 2, MaxReconnects:3})
 	cnn, err := tarantool.Connect(skyQueue.host, tarantool.Opts{User: skyQueue.user, Pass: skyQueue.pass})
 	if err != nil {
 		skyQueue.Err = err

@@ -24,6 +24,7 @@ type ConfigTests struct {
 	IsRunFixtures    bool
 	IsInitSql        bool
 	IsCacheClear     bool
+	IsDisableCache	 bool
 	IsTarantoolQueue bool
 	RootProjectDir   string
 	LogFileName      string
@@ -63,13 +64,19 @@ var InitConfigTests = func(confiForTest ConfigTests, t *testing.T) {
 
 		tarantoolQ.NewConnect()
 
+		if confiForTest.IsDisableCache == false {
+			redisCache.Init()
+		}
+
+
 		//tarantoolQ.InitFromConfigTarantoolQueue()
 
 		if confiForTest.IsCacheClear {
-			redisCache.Init()
-			keys := redisCache.Client.Keys("*")
-			for _, v := range keys.Val() {
-				redisCache.Client.Del(v)
+			if redisCache.IsCacheEnable() {
+				keys := redisCache.Client.Keys("*")
+				for _, v := range keys.Val() {
+					redisCache.Client.Del(v)
+				}
 			}
 		}
 
