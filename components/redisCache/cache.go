@@ -15,7 +15,7 @@ var Client *redis.Client
 var redisOptions redis.Options
 var isEnable bool
 
-func IsCacheEnable() bool  {
+func IsCacheEnable() bool {
 	return isEnable
 }
 
@@ -48,7 +48,6 @@ func Init() {
 			return
 		}
 	}
-
 
 	redisOptions.Addr, ok = configRedis["addr"].(string)
 	if ok == false {
@@ -113,7 +112,7 @@ func DeleteCache(key string) error {
 		return errors.New("cache not connet")
 	}
 	err := Client.Del(key).Err()
-	if err != nil {
+	if err != nil && redisCache.IsCacheEnable() {
 		log.Println(err)
 	}
 	return err
@@ -131,7 +130,9 @@ func GetCache(key string) (interface{}, error) {
 	}
 
 	if err != nil {
-		log.Println(err)
+		if redisCache.IsCacheEnable() {
+			log.Println(err)
+		}
 		return nil, err
 	}
 
@@ -148,13 +149,17 @@ func SetCache(key string, value interface{}, expirations time.Duration) error {
 
 	jsonM, err := json.Marshal(value)
 	if err != nil {
-		log.Println(err)
-		return err
+		if redisCache.IsCacheEnable() {
+			log.Println(err)
+			return err
+		}
 	}
 
 	err = Client.Set(key, jsonM, expirations).Err()
 	if err != nil {
-		log.Println("SetCache", err.Error())
+		if redisCache.IsCacheEnable() {
+			log.Println("SetCache", err.Error())
+		}
 	}
 	return err
 }
