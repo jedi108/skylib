@@ -16,8 +16,8 @@ var (
 	DbrConn *dbr.Connection
 )
 
-func GetDB() *dbr.Connection {
-	return DbrConn
+func GetDB() *sql.DB {
+	return DB
 }
 
 func openConnection() {
