@@ -33,7 +33,7 @@ func openConnection() {
 		config_db["port"] = "3306"
 	}
 	netAddr := fmt.Sprintf("%s(%s:%s)", config_db["protocol"], config_db["host"], config_db["port"])
-	dsn := fmt.Sprintf("%s:%s@%s/%s?timeout=30s&strict=true", config_db["username"], config_db["password"], netAddr, config_db["dbname"])
+	dsn := fmt.Sprintf("%s:%s@%s/%s?timeout=30s", config_db["username"], config_db["password"], netAddr, config_db["dbname"])
 	DB, err = sql.Open("mysql", dsn)
 	//defer DB.Close()
 	if err != nil {
