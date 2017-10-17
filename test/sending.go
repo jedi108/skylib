@@ -64,7 +64,7 @@ func SendRequest(uri string, cryptedJson []byte) sendReq {
 	sendResponse.Response = resp
 
 	sendResponse.Body = string(buf.Bytes())
-	T.Log(sendResponse.Body)
+	//T.Log(sendResponse.Body)
 	return sendResponse
 }
 
