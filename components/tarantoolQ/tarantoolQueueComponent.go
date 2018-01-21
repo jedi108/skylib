@@ -8,7 +8,7 @@ import (
 	"github.com/tarantool/go-tarantool/queue"
 	"log"
 	"os"
-	"skylib/app"
+	"github.com/jedi108/skylib/app"
 	"time"
 )
 

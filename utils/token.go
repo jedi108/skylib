@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"skylib/app"
+	"github.com/jedi108/skylib/app"
 	"log"
 	"github.com/nu7hatch/gouuid"
 )

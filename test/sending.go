@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"skylib/utils"
+	"github.com/jedi108/skylib/utils"
 )
 
 var url = "http://127.0.0.1:9002/"

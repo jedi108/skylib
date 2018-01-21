@@ -3,7 +3,7 @@ package test
 import (
 	"fmt"
 	"io/ioutil"
-	"skylib/app"
+	"github.com/jedi108/skylib/app"
 	"strings"
 )
 

@@ -12,9 +12,9 @@ package test
 
 import (
 	"os"
-	"skylib/app"
-	"skylib/components/redisCache"
-	"skylib/components/tarantoolQ"
+	"github.com/jedi108/skylib/app"
+	"github.com/jedi108/skylib/components/redisCache"
+	"github.com/jedi108/skylib/components/tarantoolQ"
 	"testing"
 )
 

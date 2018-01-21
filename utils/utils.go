@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
-	"skylib/app"
+	"github.com/jedi108/skylib/app"
 	"strconv"
 	b64 "encoding/base64"
 )

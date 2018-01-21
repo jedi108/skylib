@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"log"
-	"skylib/app"
+	"github.com/jedi108/skylib/app"
 	"time"
 )
 
